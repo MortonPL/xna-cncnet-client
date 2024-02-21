@@ -111,6 +111,7 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
             //dp.Hide();
             localGame = ClientConfiguration.Instance.LocalGame;
 
+            IniNameOverride = nameof(CnCNetGameLoadingLobby);
             base.Initialize();
 
             connectionManager.ConnectionLost += ConnectionManager_ConnectionLost;
@@ -125,13 +126,8 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
             tunnelSelectionWindow.Disable();
             tunnelSelectionWindow.TunnelSelected += TunnelSelectionWindow_TunnelSelected;
 
-            btnChangeTunnel = new XNAClientButton(WindowManager);
-            btnChangeTunnel.Name = nameof(btnChangeTunnel);
-            btnChangeTunnel.ClientRectangle = new Rectangle(btnLeaveGame.Right - btnLeaveGame.Width - 145,
-                btnLeaveGame.Y, UIDesignConstants.BUTTON_WIDTH_133, UIDesignConstants.BUTTON_HEIGHT);
-            btnChangeTunnel.Text = "Change Tunnel".L10N("Client:Main:ChangeTunnel");
+            btnChangeTunnel = FindChild<XNAClientButton>(nameof(btnChangeTunnel));
             btnChangeTunnel.LeftClick += BtnChangeTunnel_LeftClick;
-            AddChild(btnChangeTunnel);
 
             gameBroadcastTimer = new XNATimerControl(WindowManager);
             gameBroadcastTimer.AutoReset = true;
