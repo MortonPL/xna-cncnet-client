@@ -18,7 +18,7 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
     /// A box that allows users to make a choice,
     /// top-left of the game window.
     /// </summary>
-    public class ChoiceNotificationBox : XNAPanel
+    public class ChoiceNotificationBox : INItializableWindow
     {
         private const double DOWN_TIME_WAIT_SECONDS = 4.0;
         private const double DOWN_MOVEMENT_RATE = 2.0;
@@ -36,8 +36,8 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
         private XNAPanel gameIconPanel;
         private XNALabel lblSender;
         private XNALabel lblChoiceText;
-        private XNAClientButton affirmativeButton;
-        private XNAClientButton negativeButton;
+        private XNAClientButton btnYes;
+        private XNAClientButton btnNo;
 
         private TimeSpan downTime = TimeSpan.Zero;
 
@@ -53,56 +53,17 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
         {
             Name = nameof(ChoiceNotificationBox);
             BackgroundTexture = AssetLoader.CreateTexture(new Color(0, 0, 0, 196), 1, 1);
-            ClientRectangle = new Rectangle(0, -boxHeight, 300, boxHeight);
-            PanelBackgroundDrawMode = PanelBackgroundImageDrawMode.STRETCHED;
-
-            lblHeader = new XNALabel(WindowManager);
-            lblHeader.Name = nameof(lblHeader);
-            lblHeader.FontIndex = 1;
-            lblHeader.AnchorPoint = new Vector2(ClientRectangle.Width / 2, 12);
-            lblHeader.TextAnchor = LabelTextAnchorInfo.CENTER;
-            lblHeader.Text = "MAKE A CHOICE".L10N("Client:Main:MakeAChoice");
-            AddChild(lblHeader);
-
-            using Stream dtaIconStream = Assembly.GetAssembly(typeof(GameCollection)).GetManifestResourceStream("ClientCore.Resources.dtaicon.png");
-            using var dtaIcon = Image.Load(dtaIconStream);
-
-            gameIconPanel = new XNAPanel(WindowManager);
-            gameIconPanel.Name = nameof(gameIconPanel);
-            gameIconPanel.ClientRectangle = new Rectangle(12, lblHeader.Bottom + 6, 16, 16);
-            gameIconPanel.DrawBorders = false;
-            gameIconPanel.BackgroundTexture = AssetLoader.TextureFromImage(dtaIcon);
-            AddChild(gameIconPanel);
-
-            lblSender = new XNALabel(WindowManager);
-            lblSender.Name = nameof(lblSender);
-            lblSender.FontIndex = 1;
-            lblSender.ClientRectangle = new Rectangle(gameIconPanel.Right + 3, lblHeader.Bottom + 6, 0, 0);
-            lblSender.Text = "fonger";
-            AddChild(lblSender);
-
-            lblChoiceText = new XNALabel(WindowManager);
-            lblChoiceText.Name = nameof(lblChoiceText);
-            lblChoiceText.FontIndex = 1;
-            lblChoiceText.ClientRectangle = new Rectangle(12, lblSender.Bottom + 6, 0, 0);
-            lblChoiceText.Text = "What do you want to do?".L10N("Client:Main:ChoiceWhatDoYouWant");
-            AddChild(lblChoiceText);
-
-            affirmativeButton = new XNAClientButton(WindowManager);
-            affirmativeButton.ClientRectangle = new Rectangle(ClientRectangle.Left + 8, lblChoiceText.Bottom + 6, 75, 23);
-            affirmativeButton.Name = nameof(affirmativeButton);
-            affirmativeButton.Text = "Yes".L10N("Client:Main:ButtonYes");
-            affirmativeButton.LeftClick += AffirmativeButton_LeftClick;
-            AddChild(affirmativeButton);
-
-            negativeButton = new XNAClientButton(WindowManager);
-            negativeButton.ClientRectangle = new Rectangle(ClientRectangle.Width - (75 + 8), lblChoiceText.Bottom + 6, 75, 23);
-            negativeButton.Name = nameof(negativeButton);
-            negativeButton.Text = "No".L10N("Client:Main:ButtonNo");
-            negativeButton.LeftClick += NegativeButton_LeftClick;
-            AddChild(negativeButton);
 
             base.Initialize();
+
+            lblHeader = FindChild<XNALabel>(nameof(lblHeader));
+            gameIconPanel = FindChild<XNAPanel>(nameof(gameIconPanel));
+            lblSender = FindChild<XNALabel>(nameof(lblSender));
+            lblChoiceText = FindChild<XNALabel>(nameof(lblChoiceText));
+            btnYes = FindChild<XNAClientButton>(nameof(btnYes));
+            btnYes.LeftClick += AffirmativeButton_LeftClick;
+            btnNo = FindChild<XNAClientButton>(nameof(btnNo));
+            btnNo.LeftClick += NegativeButton_LeftClick;
         }
 
         // a timeout of zero means the notification will never be automatically dismissed
@@ -121,8 +82,8 @@ namespace DTAClient.DXGUI.Multiplayer.CnCNet
             gameIconPanel.BackgroundTexture = gameIcon;
             lblSender.Text = sender;
             lblChoiceText.Text = choiceText;
-            affirmativeButton.Text = affirmativeText;
-            negativeButton.Text = negativeText;
+            btnYes.Text = affirmativeText;
+            btnNo.Text = negativeText;
 
             // use the same clipping logic as the PM notification
             if (lblChoiceText.Width > Width)
