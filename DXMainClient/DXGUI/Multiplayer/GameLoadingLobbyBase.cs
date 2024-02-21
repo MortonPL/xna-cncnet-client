@@ -17,7 +17,7 @@ namespace DTAClient.DXGUI.Multiplayer
     /// <summary>
     /// An abstract base class for a multiplayer game loading lobby.
     /// </summary>
-    public abstract class GameLoadingLobbyBase : XNAWindow, ISwitchable
+    public abstract class GameLoadingLobbyBase : INItializableWindow, ISwitchable
     {
         public GameLoadingLobbyBase(WindowManager windowManager, DiscordHandler discordHandler) : base(windowManager)
         {
@@ -50,15 +50,11 @@ namespace DTAClient.DXGUI.Multiplayer
         protected EnhancedSoundEffect sndLeaveSound;
         protected EnhancedSoundEffect sndMessageSound;
 
-        protected XNALabel lblDescription;
         protected XNAPanel panelPlayers;
         protected XNALabel[] lblPlayerNames;
 
-        private XNALabel lblMapName;
         protected XNALabel lblMapNameValue;
-        private XNALabel lblGameMode;
         protected XNALabel lblGameModeValue;
-        private XNALabel lblSavedGameTime;
 
         protected XNAClientButton btnLoadGame;
         protected XNAClientButton btnLeaveGame;
@@ -75,22 +71,13 @@ namespace DTAClient.DXGUI.Multiplayer
 
         public override void Initialize()
         {
-            Name = "GameLoadingLobby";
+            Name = nameof(GameLoadingLobbyBase);
             ClientRectangle = new Rectangle(0, 0, 590, 510);
             BackgroundTexture = AssetLoader.LoadTexture("loadmpsavebg.png");
 
-            lblDescription = new XNALabel(WindowManager);
-            lblDescription.Name = nameof(lblDescription);
-            lblDescription.ClientRectangle = new Rectangle(12, 12, 0, 0);
-            lblDescription.Text = "Wait for all players to join and get ready, then click Load Game to load the saved multiplayer game.".L10N("Client:Main:LobbyInitialTip");
+            base.Initialize();
 
-            panelPlayers = new XNAPanel(WindowManager);
-            panelPlayers.ClientRectangle = new Rectangle(12, 32, 373, 125);
-            panelPlayers.BackgroundTexture = AssetLoader.CreateTexture(new Color(0, 0, 0, 128), 1, 1);
-            panelPlayers.PanelBackgroundDrawMode = PanelBackgroundImageDrawMode.STRETCHED;
-
-            AddChild(lblDescription);
-            AddChild(panelPlayers);
+            panelPlayers = FindChild<XNAPanel>(nameof(panelPlayers));
 
             lblPlayerNames = new XNALabel[8];
             for (int i = 0; i < 8; i++)
@@ -108,87 +95,18 @@ namespace DTAClient.DXGUI.Multiplayer
                 lblPlayerNames[i] = lblPlayerName;
             }
 
-            lblMapName = new XNALabel(WindowManager);
-            lblMapName.Name = nameof(lblMapName);
-            lblMapName.FontIndex = 1;
-            lblMapName.ClientRectangle = new Rectangle(panelPlayers.Right + 12,
-                panelPlayers.Y, 0, 0);
-            lblMapName.Text = "MAP:".L10N("Client:Main:MapLabel");
-
-            lblMapNameValue = new XNALabel(WindowManager);
-            lblMapNameValue.Name = nameof(lblMapNameValue);
-            lblMapNameValue.ClientRectangle = new Rectangle(lblMapName.X,
-                lblMapName.Y + 18, 0, 0);
-            lblMapNameValue.Text = "Map name".L10N("Client:Main:MapName");
-
-            lblGameMode = new XNALabel(WindowManager);
-            lblGameMode.Name = nameof(lblGameMode);
-            lblGameMode.ClientRectangle = new Rectangle(lblMapName.X,
-                panelPlayers.Y + 40, 0, 0);
-            lblGameMode.FontIndex = 1;
-            lblGameMode.Text = "GAME MODE:".L10N("Client:Main:GameMode");
-
-            lblGameModeValue = new XNALabel(WindowManager);
-            lblGameModeValue.Name = nameof(lblGameModeValue);
-            lblGameModeValue.ClientRectangle = new Rectangle(lblGameMode.X,
-                lblGameMode.Y + 18, 0, 0);
-            lblGameModeValue.Text = "Game mode".L10N("Client:Main:GameModeValueText");
-
-            lblSavedGameTime = new XNALabel(WindowManager);
-            lblSavedGameTime.Name = nameof(lblSavedGameTime);
-            lblSavedGameTime.ClientRectangle = new Rectangle(lblMapName.X,
-                panelPlayers.Bottom - 40, 0, 0);
-            lblSavedGameTime.FontIndex = 1;
-            lblSavedGameTime.Text = "SAVED GAME:".L10N("Client:Main:SavedGame");
-
-            ddSavedGame = new XNAClientDropDown(WindowManager);
-            ddSavedGame.Name = nameof(ddSavedGame);
-            ddSavedGame.ClientRectangle = new Rectangle(lblSavedGameTime.X,
-                panelPlayers.Bottom - 21,
-                Width - lblSavedGameTime.X - 12, 21);
+            lblMapNameValue = FindChild<XNALabel>(nameof(lblMapNameValue));
+            lblGameModeValue = FindChild<XNALabel>(nameof(lblGameModeValue));
+            ddSavedGame = FindChild<XNAClientDropDown>(nameof(ddSavedGame));
             ddSavedGame.SelectedIndexChanged += DdSavedGame_SelectedIndexChanged;
-
-            lbChatMessages = new ChatListBox(WindowManager);
-            lbChatMessages.Name = nameof(lbChatMessages);
-            lbChatMessages.BackgroundTexture = AssetLoader.CreateTexture(new Color(0, 0, 0, 128), 1, 1);
-            lbChatMessages.PanelBackgroundDrawMode = PanelBackgroundImageDrawMode.STRETCHED;
-            lbChatMessages.ClientRectangle = new Rectangle(12, panelPlayers.Bottom + 12,
-                Width - 24,
-                Height - panelPlayers.Bottom - 12 - 29 - 34);
-
-            tbChatInput = new XNATextBox(WindowManager);
-            tbChatInput.Name = nameof(tbChatInput);
-            tbChatInput.ClientRectangle = new Rectangle(lbChatMessages.X,
-                lbChatMessages.Bottom + 3, lbChatMessages.Width, 19);
+            lbChatMessages = FindChild<ChatListBox>(nameof(lbChatMessages));
+            tbChatInput = FindChild<XNATextBox>(nameof(tbChatInput));
             tbChatInput.MaximumTextLength = 200;
             tbChatInput.EnterPressed += TbChatInput_EnterPressed;
-
-            btnLoadGame = new XNAClientButton(WindowManager);
-            btnLoadGame.Name = nameof(btnLoadGame);
-            btnLoadGame.ClientRectangle = new Rectangle(lbChatMessages.X,
-                tbChatInput.Bottom + 6, UIDesignConstants.BUTTON_WIDTH_133, UIDesignConstants.BUTTON_HEIGHT);
-            btnLoadGame.Text = "Load Game".L10N("Client:Main:LoadGame");
+            btnLoadGame = FindChild<XNAClientButton>(nameof(btnLoadGame));
             btnLoadGame.LeftClick += BtnLoadGame_LeftClick;
-
-            btnLeaveGame = new XNAClientButton(WindowManager);
-            btnLeaveGame.Name = nameof(btnLeaveGame);
-            btnLeaveGame.ClientRectangle = new Rectangle(Width - 145,
-                btnLoadGame.Y, UIDesignConstants.BUTTON_WIDTH_133, UIDesignConstants.BUTTON_HEIGHT);
-            btnLeaveGame.Text = "Leave Game".L10N("Client:Main:LeaveGame");
+            btnLeaveGame = FindChild<XNAClientButton>(nameof(btnLeaveGame));
             btnLeaveGame.LeftClick += BtnLeaveGame_LeftClick;
-
-            AddChild(lblMapName);
-            AddChild(lblMapNameValue);
-            AddChild(lblGameMode);
-            AddChild(lblGameModeValue);
-            AddChild(lblSavedGameTime);
-            AddChild(lbChatMessages);
-            AddChild(tbChatInput);
-            AddChild(btnLoadGame);
-            AddChild(btnLeaveGame);
-            AddChild(ddSavedGame);
-
-            base.Initialize();
 
             sndJoinSound = new EnhancedSoundEffect("joingame.wav", 0.0, 0.0, ClientConfiguration.Instance.SoundGameLobbyJoinCooldown);
             sndLeaveSound = new EnhancedSoundEffect("leavegame.wav", 0.0, 0.0, ClientConfiguration.Instance.SoundGameLobbyLeaveCooldown);
