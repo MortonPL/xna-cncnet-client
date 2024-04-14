@@ -1913,8 +1913,6 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             CopyPlayerDataToUI();
             btnLaunchGame.SetRank(GetRank());
 
-            CheckDisallowedSides();
-
             if (oldSideId != Players.Find(p => p.Name == ProgramConstants.PLAYERNAME)?.SideId)
                 UpdateDiscordPresence();
         }
@@ -2061,6 +2059,8 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             MapPreviewBox.UpdateStartingLocationTexts();
             UpdateMapPreviewBoxEnabledStatus();
 
+            CheckDisallowedSides();
+
             PlayerUpdatingInProgress = false;
         }
 
@@ -2197,8 +2197,6 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
                 if (!Map.IsCoop && (Map.ForceNoTeams || GameMode.ForceNoTeams))
                     pInfo.TeamId = 0;
             }
-
-            CheckDisallowedSides();
 
 
             if (Map.CoopInfo != null)
