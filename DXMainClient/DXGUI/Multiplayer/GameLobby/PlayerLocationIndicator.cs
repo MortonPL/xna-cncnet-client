@@ -31,6 +31,7 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
 
         private Texture2D baseTexture;
         private Texture2D hoverTexture;
+        private Texture2D realHoverTexture;
         private Texture2D usedTexture;
         public Texture2D WaypointTexture { get; set; }
         public List<PlayerInfo> Players = new List<PlayerInfo>();
@@ -76,6 +77,7 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
 
             baseTexture = AssetLoader.LoadTexture("slocindicator.png");
             hoverTexture = AssetLoader.LoadTexture("slocindicatorh.png");
+            realHoverTexture = AssetLoader.LoadTexture("slocindicatorc.png");
             ClientRectangle = baseTexture.Bounds;
             lineHeight = (int)Renderer.GetTextDimensions("@", FontIndex).Y + 1;
 
@@ -236,10 +238,10 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             if (isHoveredOn ||
                 (contextMenu.Tag == this.Tag && contextMenu.Visible))
             {
-                Renderer.DrawTexture(usedTexture,
+                Renderer.DrawTexture(realHoverTexture,
                 new Vector2(displayRectangle.Center.X + 0.5f, displayRectangle.Center.Y),
                 (float)angle,
-                origin,
+                new Vector2(realHoverTexture.Width / 2, realHoverTexture.Height / 2),
                 new Vector2(TEXTURE_SCALE + 0.1f), hoverRemapColor);
             }
 
