@@ -775,15 +775,20 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             }
 
             List<int> occupiedColorIds = new List<int>();
-            foreach (PlayerInfo player in Players)
+            foreach (var checkBox in CheckBoxes)
+                checkBox.ApplyArchonHack(ref ArchonHack);
+            if (!ArchonHack)
             {
-                if (occupiedColorIds.Contains(player.ColorId) && player.ColorId > 0)
+                foreach (PlayerInfo player in Players)
                 {
-                    SharedColorsNotification();
-                    return;
-                }
+                    if (occupiedColorIds.Contains(player.ColorId) && player.ColorId > 0)
+                    {
+                        SharedColorsNotification();
+                        return;
+                    }
 
-                occupiedColorIds.Add(player.ColorId);
+                    occupiedColorIds.Add(player.ColorId);
+                }
             }
 
             if (AIPlayers.Count(pInfo => pInfo.SideId == ddPlayerSides[0].Items.Count - 1) > 0)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Rampastring.Tools;
 using Rampastring.XNAUI;
 using ClientGUI;
@@ -55,6 +55,8 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
         /// Defaults to -1, which means none.
         /// </summary>
         public List<int> DisallowedSideIndices = new List<int>();
+
+        public bool ArchonHack = false;
 
         public bool AllowChanges { get; set; } = true;
 
@@ -134,6 +136,9 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
                 case "MapScoringMode":
                     MapScoringMode = (CheckBoxMapScoringMode)Enum.Parse(typeof(CheckBoxMapScoringMode), value);
                     return;
+                case "ArchonHack":
+                    ArchonHack = Conversions.BooleanFromString(value, false);
+                    return;
             }
 
             base.ParseControlINIAttribute(iniFile, key, value);
@@ -188,6 +193,12 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
                     disallowedArray[sideNotAllowed] = true;
                 }
             }
+        }
+
+        public void ApplyArchonHack(ref bool isArchon)
+        {
+            if (Checked != reversed)
+                isArchon |= ArchonHack;
         }
 
         public override void OnLeftClick()
