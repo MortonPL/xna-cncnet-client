@@ -132,6 +132,7 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
         protected XNAClientButton btnLeaveGame;
         protected GameLaunchButton btnLaunchGame;
         protected XNAClientButton btnPickRandomMap;
+        protected XNAClientButton btnNextQuote;
         protected XNALabel lblMapName;
         protected XNALabel lblMapAuthor;
         protected XNALabel lblGameMode;
@@ -294,6 +295,10 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             foreach (GameMode gm in GameModeMaps.GameModes)
                 ddGameModeMapFilter.AddItem(CreateGameFilterItem(gm.UIName, new GameModeMapFilter(GetGameModeMaps(gm))));
 
+            BtnNextQuote_LeftClick(null, null);
+            btnNextQuote = FindChild<XNAClientButton>(nameof(btnNextQuote));
+            btnNextQuote.LeftClick += BtnNextQuote_LeftClick;
+
             lblGameModeSelect = FindChild<XNALabel>(nameof(lblGameModeSelect));
 
             InitBtnMapSort();
@@ -308,6 +313,13 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             DropDowns.ForEach(dd => dd.SelectedIndexChanged += Dropdown_SelectedIndexChanged);
 
             InitializeGameOptionPresetUI();
+        }
+
+        private void BtnNextQuote_LeftClick(object sender, EventArgs e)
+        {
+            var ddFakeQuotes = FindChild<XNAClientDropDown>("ddFakeQuotes");
+            var i = new Random().Next(0, ddFakeQuotes.Items.Count);
+            FindChild<XNALabel>("lblQuote").Text = ddFakeQuotes.Items[i].Text.Replace('@', '\n');
         }
 
         /// <summary>
