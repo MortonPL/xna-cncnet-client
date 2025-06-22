@@ -694,9 +694,9 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             ReadINIForControl(tbChatInput);
             ReadINIForControl(lbGameModeMapList);
             ReadINIForControl(lblMapName);
-            ReadINIForControl(lblMapAuthor);
             ReadINIForControl(lblGameMode);
             ReadINIForControl(lblMapSize);
+            ReadINIForControl(lblMapAuthor);
             ReadINIForControl(btnMapSortAlphabetically);
 
             ddGameModeMapFilter.Disable();

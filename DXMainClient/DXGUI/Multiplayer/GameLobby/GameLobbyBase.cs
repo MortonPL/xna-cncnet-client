@@ -324,7 +324,7 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             btnMapSortAlphabetically.Name = nameof(btnMapSortAlphabetically);
             btnMapSortAlphabetically.ClientRectangle = new Rectangle(
                 ddGameModeMapFilter.X + -ddGameModeMapFilter.Height - 4, ddGameModeMapFilter.Y,
-                ddGameModeMapFilter.Height, ddGameModeMapFilter.Height
+                21, 21
             );
             btnMapSortAlphabetically.LeftClick += BtnMapSortAlphabetically_LeftClick;
             btnMapSortAlphabetically.SetToolTipText("Sort Maps Alphabetically".L10N("Client:Main:MapSortAlphabeticallyToolTip"));
