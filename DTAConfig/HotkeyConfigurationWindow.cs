@@ -166,7 +166,7 @@ namespace DTAConfig
             lblDefaultHotkeyValue.ClientRectangle = new Rectangle(lblDefaultHotkey.Right + 12, lblDefaultHotkey.Y, 0, 0);
 
             var btnSave = new XNAClientButton(WindowManager);
-            btnSave.Name = "btnSave";
+            btnSave.Name = "btnSaveHotkeys";
             btnSave.ClientRectangle = new Rectangle(12, lbHotkeys.Bottom + 12, UIDesignConstants.BUTTON_WIDTH_92, UIDesignConstants.BUTTON_HEIGHT);
             btnSave.Text = "Save".L10N("Client:DTAConfig:ButtonSave");
             btnSave.LeftClick += BtnSave_LeftClick;

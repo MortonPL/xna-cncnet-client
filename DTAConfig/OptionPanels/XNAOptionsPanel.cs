@@ -27,8 +27,8 @@ namespace DTAConfig.OptionPanels
         public override void Initialize()
         {
             ClientRectangle = new Rectangle(12, 47,
-                Parent.Width - 24,
-                Parent.Height - 94);
+                580,
+                500);
             BackgroundTexture = AssetLoader.CreateTexture(new Color(0, 0, 0, 128), 2, 2);
             PanelBackgroundDrawMode = PanelBackgroundImageDrawMode.STRETCHED;
 

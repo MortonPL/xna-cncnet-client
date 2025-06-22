@@ -159,12 +159,11 @@ namespace DTAConfig.OptionPanels
             lblNotice.Text = ("* If you are currently connected to CnCNet, you need to log out and reconnect\nfor your new name to be applied.").L10N("Client:DTAConfig:ReconnectAfterRename");
 
             hotkeyConfigWindow = new HotkeyConfigurationWindow(WindowManager);
-            DarkeningPanel.AddAndInitializeWithControl(WindowManager, hotkeyConfigWindow);
             hotkeyConfigWindow.Disable();
 
             var btnConfigureHotkeys = new XNAClientButton(WindowManager);
             btnConfigureHotkeys.Name = nameof(btnConfigureHotkeys);
-            btnConfigureHotkeys.ClientRectangle = new Rectangle(lblPlayerName.X, lblNotice.Bottom + 36, UIDesignConstants.BUTTON_WIDTH_160, UIDesignConstants.BUTTON_HEIGHT);
+            btnConfigureHotkeys.ClientRectangle = new Rectangle(lblPlayerName.X, lblNotice.Bottom + 36, UIDesignConstants.BUTTON_WIDTH_133, UIDesignConstants.BUTTON_HEIGHT);
             btnConfigureHotkeys.Text = "Configure Hotkeys".L10N("Client:DTAConfig:ConfigureHotkeys");
             btnConfigureHotkeys.LeftClick += BtnConfigureHotkeys_LeftClick;
 
@@ -178,6 +177,7 @@ namespace DTAConfig.OptionPanels
             AddChild(tbPlayerName);
             AddChild(lblNotice);
             AddChild(btnConfigureHotkeys);
+            AddChild(hotkeyConfigWindow);
         }
 
         private void BtnConfigureHotkeys_LeftClick(object sender, EventArgs e)

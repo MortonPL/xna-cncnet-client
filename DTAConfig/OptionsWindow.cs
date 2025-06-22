@@ -1,19 +1,27 @@
-﻿using ClientCore.Extensions;
+﻿using System;
+using System.Xml.Linq;
+
 using ClientCore;
 using ClientCore.CnCNet5;
 using ClientCore.Enums;
+using ClientCore.Extensions;
+
 using ClientGUI;
+
+using ClientUpdater;
+
 using DTAConfig.OptionPanels;
+
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
 using Rampastring.Tools;
 using Rampastring.XNAUI;
 using Rampastring.XNAUI.XNAControls;
-using System;
-using ClientUpdater;
 
 namespace DTAConfig
 {
-    public class OptionsWindow : XNAWindow
+    public class OptionsWindow : INItializableWindow
     {
         public OptionsWindow(WindowManager windowManager, GameCollection gameCollection) : base(windowManager)
         {
@@ -22,9 +30,8 @@ namespace DTAConfig
 
         public event EventHandler OnForceUpdate;
 
-        private XNAClientTabControl tabControl;
-
         private XNAOptionsPanel[] optionsPanels;
+        private XNAClientButton[] optionsButtons;
         private ComponentsPanel componentsPanel;
 
         private DisplayOptionsPanel displayOptionsPanel;
@@ -32,37 +39,59 @@ namespace DTAConfig
 
         private GameCollection gameCollection;
 
+        private int currentTab = 0;
+        private Texture2D savedButtonTexture;
+
         public override void Initialize()
         {
             Name = "OptionsWindow";
             ClientRectangle = new Rectangle(0, 0, 576, 475);
             BackgroundTexture = AssetLoader.LoadTextureUncached("optionsbg.png");
 
-            tabControl = new XNAClientTabControl(WindowManager);
-            tabControl.Name = "tabControl";
-            tabControl.ClientRectangle = new Rectangle(12, 12, 0, 23);
-            tabControl.FontIndex = 1;
-            tabControl.ClickSound = new EnhancedSoundEffect("button.wav");
-            tabControl.AddTab("Display".L10N("Client:DTAConfig:TabDisplay"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.AddTab("Audio".L10N("Client:DTAConfig:TabAudio"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.AddTab("Game".L10N("Client:DTAConfig:TabGame"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.AddTab("CnCNet".L10N("Client:DTAConfig:TabCnCNet"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.AddTab("Updater".L10N("Client:DTAConfig:TabUpdater"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.AddTab("Components".L10N("Client:DTAConfig:TabComponents"), UIDesignConstants.BUTTON_WIDTH_92);
-            tabControl.SelectedIndexChanged += TabControl_SelectedIndexChanged;
+            base.Initialize();
 
-            var btnCancel = new XNAClientButton(WindowManager);
-            btnCancel.Name = "btnCancel";
-            btnCancel.ClientRectangle = new Rectangle(Width - 104,
-                Height - 35, UIDesignConstants.BUTTON_WIDTH_92, UIDesignConstants.BUTTON_HEIGHT);
-            btnCancel.Text = "Cancel".L10N("Client:DTAConfig:ButtonCancel");
+            XNAClientButton btnCancel;
+            btnCancel = FindChild<XNAClientButton>(nameof(btnCancel));
             btnCancel.LeftClick += BtnBack_LeftClick;
 
-            var btnSave = new XNAClientButton(WindowManager);
-            btnSave.Name = "btnSave";
-            btnSave.ClientRectangle = new Rectangle(12, btnCancel.Y, UIDesignConstants.BUTTON_WIDTH_92, UIDesignConstants.BUTTON_HEIGHT);
-            btnSave.Text = "Save".L10N("Client:DTAConfig:ButtonSave");
+            XNAClientButton btnSave;
+            btnSave = FindChild<XNAClientButton>(nameof(btnSave));
             btnSave.LeftClick += BtnSave_LeftClick;
+
+            XNAClientButton btnTab1;
+            btnTab1 = FindChild<XNAClientButton>(nameof(btnTab1));
+            btnTab1.LeftClick += BtnTab1_LeftClick;
+
+            XNAClientButton btnTab2;
+            btnTab2 = FindChild<XNAClientButton>(nameof(btnTab2));
+            btnTab2.LeftClick += BtnTab2_LeftClick;
+
+            XNAClientButton btnTab3;
+            btnTab3 = FindChild<XNAClientButton>(nameof(btnTab3));
+            btnTab3.LeftClick += BtnTab3_LeftClick;
+
+            XNAClientButton btnTab4;
+            btnTab4 = FindChild<XNAClientButton>(nameof(btnTab4));
+            btnTab4.LeftClick += BtnTab4_LeftClick;
+
+            XNAClientButton btnTab5;
+            btnTab5 = FindChild<XNAClientButton>(nameof(btnTab5));
+            btnTab5.LeftClick += BtnTab5_LeftClick;
+
+            XNAClientButton btnTab6;
+            btnTab6 = FindChild<XNAClientButton>(nameof(btnTab6));
+            btnTab6.LeftClick += BtnTab6_LeftClick;
+
+            optionsButtons =
+            [
+                btnTab1,
+                btnTab2,
+                btnTab3,
+                btnTab4,
+                btnTab5,
+                btnTab6,
+            ];
+            savedButtonTexture = btnTab1.IdleTexture;
 
             displayOptionsPanel = new DisplayOptionsPanel(WindowManager, UserINISettings.Instance);
             componentsPanel = new ComponentsPanel(WindowManager, UserINISettings.Instance);
@@ -81,11 +110,11 @@ namespace DTAConfig
 
             if (ClientConfiguration.Instance.ModMode || Updater.UpdateMirrors == null || Updater.UpdateMirrors.Count < 1)
             {
-                tabControl.MakeUnselectable(4);
-                tabControl.MakeUnselectable(5);
+                btnTab5.Enabled = false;
+                btnTab6.Enabled = false;
             }
             else if (Updater.CustomComponents == null || Updater.CustomComponents.Count < 1)
-                tabControl.MakeUnselectable(5);
+                btnTab6.Enabled = false;
 
             foreach (var panel in optionsPanels)
             {
@@ -94,39 +123,35 @@ namespace DTAConfig
                 panel.Disable();
             }
 
-            optionsPanels[0].Enable();
+            TabControl_SelectedIndexChanged(0);
 
-            AddChild(tabControl);
-            AddChild(btnCancel);
-            AddChild(btnSave);
-
-            base.Initialize();
+            var iniFile = new CCIniFile(SafePath.CombineFilePath(ProgramConstants.GetResourcePath(), FormattableString.Invariant($"{Name}.ini")));
+            foreach (var panel in optionsPanels)
+                panel.ParseUserOptions(iniFile);
 
             CenterOnParent();
         }
 
         public void SetTopBar(XNAControl topBar) => this.topBar = topBar;
 
-        /// <summary>
-        /// Parses extra options defined by the modder
-        /// from an INI file. Called from XNAWindow.SetAttributesFromINI.
-        /// </summary>
-        /// <param name="iniFile">The INI file.</param>
-        protected override void GetINIAttributes(IniFile iniFile)
+        private void BtnTab1_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(0);
+        private void BtnTab2_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(1);
+        private void BtnTab3_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(2);
+        private void BtnTab4_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(3);
+        private void BtnTab5_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(4);
+        private void BtnTab6_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(5);
+
+        private void TabControl_SelectedIndexChanged(int i)
         {
-            base.GetINIAttributes(iniFile);
+            optionsPanels[currentTab].Disable();
+            optionsPanels[i].Enable();
+            optionsPanels[i].RefreshPanel();
 
-            foreach (var panel in optionsPanels)
-                panel.ParseUserOptions(iniFile);
-        }
+            optionsButtons[currentTab].IdleTexture = savedButtonTexture;
+            savedButtonTexture = optionsButtons[i].IdleTexture;
+            optionsButtons[i].IdleTexture = optionsButtons[i].HoverTexture;
 
-        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            foreach (var panel in optionsPanels)
-                panel.Disable();
-
-            optionsPanels[tabControl.SelectedTab].Enable();
-            optionsPanels[tabControl.SelectedTab].RefreshPanel();
+            currentTab = i;
         }
 
         private void BtnBack_LeftClick(object sender, EventArgs e)
@@ -272,13 +297,7 @@ namespace DTAConfig
             }
         }
 
-        public void SwitchToCustomComponentsPanel()
-        {
-            foreach (var panel in optionsPanels)
-                panel.Disable();
-
-            tabControl.SelectedTab = 5;
-        }
+        public void SwitchToCustomComponentsPanel() => TabControl_SelectedIndexChanged(6);
 
         public void InstallCustomComponent(int id) => componentsPanel.InstallComponent(id);
 
