@@ -25,12 +25,14 @@ namespace DTAClient.DXGUI.Generic
         private XNAPanel panelGameStatistics;
         private XNAPanel panelTotalStatistics;
 
+        private XNAClientButton[] tabs;
+        private Texture2D savedButtonTexture;
+        private int currentTab = 0;
+
         private XNAClientDropDown cmbGameModeFilter;
         private XNAClientDropDown cmbGameClassFilter;
 
         private XNAClientCheckBox chkIncludeSpectatedGames;
-
-        private XNAClientTabControl tabControl;
 
         // Controls for game statistics
 
@@ -100,11 +102,20 @@ namespace DTAClient.DXGUI.Generic
 
             base.Initialize();
 
-            tabControl = FindChild<XNAClientTabControl>(nameof(tabControl));
-            tabControl.ClickSound = new EnhancedSoundEffect("button.wav");
-            tabControl.AddTab("Game Statistics".L10N("Client:Main:GameStatistic"), UIDesignConstants.BUTTON_WIDTH_133);
-            tabControl.AddTab("Total Statistics".L10N("Client:Main:TotalStatistic"), UIDesignConstants.BUTTON_WIDTH_133);
-            tabControl.SelectedIndexChanged += TabControl_SelectedIndexChanged;
+            XNAClientButton btnTab1;
+            btnTab1 = FindChild<XNAClientButton>(nameof(btnTab1));
+            btnTab1.LeftClick += BtnTab1_LeftClick;
+
+            XNAClientButton btnTab2;
+            btnTab2 = FindChild<XNAClientButton>(nameof(btnTab2));
+            btnTab2.LeftClick += BtnTab2_LeftClick;
+
+            tabs =
+            [
+                btnTab1,
+                btnTab2
+            ];
+            savedButtonTexture = btnTab1.IdleTexture;
 
             cmbGameClassFilter = FindChild<XNAClientDropDown>(nameof(cmbGameClassFilter));
             cmbGameClassFilter.AddItem("All games".L10N("Client:Main:FilterAll"));
@@ -224,6 +235,8 @@ namespace DTAClient.DXGUI.Generic
 
             CenterOnParent();
 
+            TabControl_SelectedIndexChanged(0);
+
             sides = ClientConfiguration.Instance.Sides.Split(',')
                 .Select(s => (Name: s, UIName: s.L10N($"INI:Sides:{s}"))).ToArray();
 
@@ -267,21 +280,33 @@ namespace DTAClient.DXGUI.Generic
             panelTotalStatistics.AddChild(label);
         }
 
-        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        private void BtnTab1_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(0);
+        private void BtnTab2_LeftClick(object sender, EventArgs e) => TabControl_SelectedIndexChanged(1);
+
+        private void TabControl_SelectedIndexChanged(int i)
         {
-            if (tabControl.SelectedTab == 1)
+            if (i == 1)
             {
                 panelGameStatistics.Visible = false;
                 panelGameStatistics.Enabled = false;
                 panelTotalStatistics.Visible = true;
                 panelTotalStatistics.Enabled = true;
+                tabs[currentTab].IdleTexture = savedButtonTexture;
+                savedButtonTexture = tabs[1].IdleTexture;
+                tabs[1].IdleTexture = tabs[1].HoverTexture;
+                currentTab = 1;
             }
             else
             {
+                
                 panelGameStatistics.Visible = true;
                 panelGameStatistics.Enabled = true;
                 panelTotalStatistics.Visible = false;
                 panelTotalStatistics.Enabled = false;
+                tabs[currentTab].IdleTexture = savedButtonTexture;
+                savedButtonTexture = tabs[0].IdleTexture;
+                tabs[0].IdleTexture = tabs[0].HoverTexture;
+                currentTab = 0;
             }
         }
 
