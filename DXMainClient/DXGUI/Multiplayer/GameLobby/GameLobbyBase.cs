@@ -195,6 +195,8 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
 
         private LoadOrSaveGameOptionPresetWindow loadOrSaveGameOptionPresetWindow;
 
+        protected XNAClientTabControl tabGameOptions { get; set; }
+
         public override void Initialize()
         {
             Name = _iniSectionName;
@@ -218,6 +220,13 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             GameOptionsIni = new IniFile(SafePath.CombineFilePath(ProgramConstants.GetBaseResourcePath(), "GameOptions.ini"));
 
             base.Initialize();
+
+            tabGameOptions = FindChild<XNAClientTabControl>(nameof(tabGameOptions));
+            tabGameOptions.AddTab("Basic", 75);
+            tabGameOptions.AddTab("Modifiers", 75);
+            tabGameOptions.AddTab("Cosmetic", 75);
+            tabGameOptions.AddTab("Extra", 75);
+            tabGameOptions.SelectedIndexChanged += TabGameOptions_SelectedIndexChanged;
 
             try
             {
@@ -479,6 +488,36 @@ namespace DTAClient.DXGUI.Multiplayer.GameLobby
             CheckDisallowedSides();
 
             btnLaunchGame.SetRank(GetRank());
+        }
+
+        protected void TabGameOptions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var basic = FindChild<XNAControl>("BasicOptionsPanel");
+            var mods = FindChild<XNAControl>("ModifiersOptionsPanel");
+            var cosmetic = FindChild<XNAControl>("CosmeticOptionsPanel");
+            var extra = FindChild<XNAControl>("ExtraOptionsPanel");
+
+            basic.Disable();
+            mods.Disable();
+            cosmetic.Disable();
+            extra.Disable();
+
+            switch (tabGameOptions.SelectedTab)
+            {
+                default:
+                case 0:
+                    basic.Enable();
+                    break;
+                case 1:
+                    mods.Enable();
+                    break;
+                case 2:
+                    cosmetic.Enable();
+                    break;
+                case 3:
+                    extra.Enable();
+                    break;
+            }
         }
 
         protected void DdGameModeMapFilter_SelectedIndexChanged(object sender, EventArgs e)
