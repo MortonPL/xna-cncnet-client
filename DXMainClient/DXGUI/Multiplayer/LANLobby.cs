@@ -244,12 +244,13 @@ namespace DTAClient.DXGUI.Multiplayer
 
             lanGameLobby = new LANGameLobby(WindowManager, "MultiplayerGameLobby",
                 null, chatColors, mapLoader, discordHandler, pmWindow, random);
-            DarkeningPanel.AddAndInitializeWithControl(WindowManager, lanGameLobby);
+            AddChild(lanGameLobby);
             lanGameLobby.Disable();
+            
 
             lanGameLoadingLobby = new LANGameLoadingLobby(WindowManager,
                 chatColors, mapLoader, discordHandler);
-            DarkeningPanel.AddAndInitializeWithControl(WindowManager, lanGameLoadingLobby);
+            AddChild(lanGameLoadingLobby);
             lanGameLoadingLobby.Disable();
 
             int selectedColor = UserINISettings.Instance.LANChatColor;

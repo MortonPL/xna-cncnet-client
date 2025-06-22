@@ -24,6 +24,12 @@ namespace ClientGUI
             }
         }
 
+
+        /// <summary>
+        /// Is the mouce cursor hovering over this button?
+        /// </summary>
+        public bool Hovering { get; private set; } = false;
+
         public XNAClientButton(WindowManager windowManager) : base(windowManager)
         {
             FontIndex = 1;
@@ -66,6 +72,18 @@ namespace ClientGUI
             }
 
             base.ParseControlINIAttribute(iniFile, key, value);
+        }
+
+        public override void OnMouseEnter()
+        {
+            base.OnMouseEnter();
+            Hovering = true;
+        }
+
+        public override void OnMouseLeave()
+        {
+            base.OnMouseLeave();
+            Hovering = false;
         }
     }
 }

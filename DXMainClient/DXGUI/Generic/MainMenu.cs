@@ -23,6 +23,7 @@ using System.Linq;
 using System.Threading;
 using ClientUpdater;
 using DTAClient.Domain.Multiplayer;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace DTAClient.DXGUI.Generic
 {
@@ -147,7 +148,10 @@ namespace DTAClient.DXGUI.Generic
 
         private CancellationTokenSource cncnetPlayerCountCancellationSource;
 
+        private int BackgroundUpdateTicks = 0;
+
         // Main Menu Buttons
+        private XNAClientButton btnSinglePlayer;
         private XNAClientButton btnNewCampaign;
         private XNAClientButton btnLoadGame;
         private XNAClientButton btnSkirmish;
@@ -158,6 +162,13 @@ namespace DTAClient.DXGUI.Generic
         private XNAClientButton btnStatistics;
         private XNAClientButton btnCredits;
         private XNAClientButton btnExtras;
+        private XNAClientButton btnExit;
+
+        private Texture2D DefaultTexture;
+        private Texture2D SinglePlayerTexture;
+        private Texture2D CreditsTexture;
+        private Texture2D MapEditorTexture;
+        private Texture2D ExitTexture;
 
         /// <summary>
         /// Initializes the main menu's controls.
@@ -174,6 +185,14 @@ namespace DTAClient.DXGUI.Generic
             WindowManager.CenterControlOnScreen(this);
 
             base.Initialize();
+
+            DefaultTexture = BackgroundTexture;
+            SinglePlayerTexture = AssetLoader.LoadTexture("MainMenu/menu_single.png");
+            CreditsTexture = AssetLoader.LoadTexture("MainMenu/menu_credits.png");
+            MapEditorTexture = AssetLoader.LoadTexture("MainMenu/menu_mapeditor.png");
+            ExitTexture = AssetLoader.LoadTexture("MainMenu/menu_exit.png");
+
+            btnSinglePlayer = FindChild<XNAClientButton>(nameof(btnSinglePlayer));
 
             btnNewCampaign = FindChild<XNAClientButton>(nameof(btnNewCampaign));
             btnNewCampaign.LeftClick += BtnNewCampaign_LeftClick;
@@ -210,7 +229,6 @@ namespace DTAClient.DXGUI.Generic
             }
             btnExtras.LeftClick += BtnExtras_LeftClick;
 
-            XNAClientButton btnExit;
             btnExit = FindChild<XNAClientButton>(nameof(btnExit));
             btnExit.LeftClick += BtnExit_LeftClick;
 
@@ -533,10 +551,10 @@ namespace DTAClient.DXGUI.Generic
                 updateWindow,
                 extrasWindow,
             })
-                DarkeningPanel.AddAndInitializeWithControl(WindowManager, control);
+                WindowManager.AddAndInitializeControl(control);
 
             optionsWindow.SetTopBar(topBar);
-            DarkeningPanel.AddAndInitializeWithControl(WindowManager, optionsWindow);
+            WindowManager.AddAndInitializeControl(optionsWindow);
             WindowManager.AddAndInitializeControl(privateMessagingPanel);
             privateMessagingPanel.AddChild(privateMessagingWindow);
             topBar.SetTertiarySwitch(privateMessagingWindow);
@@ -931,7 +949,80 @@ namespace DTAClient.DXGUI.Generic
             if (isMusicFading)
                 FadeMusic(gameTime);
 
+            UpdateBackground();
+
             base.Update(gameTime);
+        }
+
+
+        /// <summary>
+        /// Update the main background texture if the user is hovering over one of the main menu buttons.
+        /// </summary>
+        private void UpdateBackground()
+        {
+            var oldTarget = BackgroundTexture;
+            var target = BackgroundTexture;
+            if (btnSinglePlayer.Hovering)
+            {
+                target = SinglePlayerTexture;
+            }
+            else if (btnNewCampaign.Hovering)
+            {
+                target = campaignSelector.BackgroundTexture;
+            }
+            else if (btnLoadGame.Hovering)
+            {
+                target = gameLoadingWindow.BackgroundTexture;
+            }
+            else if (btnSkirmish.Hovering)
+            {
+                target = skirmishLobby.BackgroundTexture;
+            }
+            else if (btnCnCNet.Hovering)
+            {
+                target = cncnetLobby.BackgroundTexture;
+            }
+            else if (btnLan.Hovering)
+            {
+                target = lanLobby.BackgroundTexture;
+            }
+            else if (btnOptions.Hovering)
+            {
+                target = optionsWindow.BackgroundTexture;
+            }
+            else if (btnStatistics.Hovering)
+            {
+                target = statisticsWindow.BackgroundTexture;
+            }
+            else if (btnMapEditor.Hovering)
+            {
+                target = MapEditorTexture;
+            }
+            else if (btnCredits.Hovering)
+            {
+                target = CreditsTexture;
+            }
+            else if (btnExit.Hovering)
+            {
+                target = ExitTexture;
+            }
+            else
+            {
+                target = DefaultTexture;
+            }
+
+            // Changed target texture.
+            if (oldTarget != target)
+            {
+                if (IsActive && --BackgroundUpdateTicks < 0)
+                {
+                    BackgroundTexture = target;
+                }
+            }
+            else
+            {
+                BackgroundUpdateTicks = 2;
+            }
         }
 
         public override void Draw(GameTime gameTime)

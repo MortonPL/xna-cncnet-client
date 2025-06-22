@@ -274,7 +274,7 @@ namespace DTAClient.DXGUI.Generic
 
             // HACK warning
             // TODO: add a way for DarkeningPanel to skip transitions
-            ((DarkeningPanel)((XNAControl)cncnetLobbySwitch).Parent).Alpha = 1.0f;
+            //((DarkeningPanel)((XNAControl)cncnetLobbySwitch).Parent).Alpha = 1.0f;
         }
 
         private void BtnMainButton_LeftClick(object sender, EventArgs e)
